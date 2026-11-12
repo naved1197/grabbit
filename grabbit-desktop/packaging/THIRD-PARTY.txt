@@ -1,3 +1,6 @@
+Grabbit is © 2026 Cubehole (https://cubehole.com), released under the MIT License:
+https://github.com/naved1197/grabbit/blob/main/LICENSE
+
 Grabbit includes these programs, each under its own license:
 
 yt-dlp           The Unlicense (public domain)        https://github.com/yt-dlp/yt-dlp

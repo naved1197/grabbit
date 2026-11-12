@@ -1,0 +1,52 @@
+name: Bug report
+description: Something won't download, or Grabbit isn't working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! This repository is public, so please **don't paste cookies, passwords or private links**.
+        Videos protected by DRM (Netflix, Prime Video, Disney+, Spotify) can't be downloaded. That's expected, not a bug.
+  - type: dropdown
+    id: part
+    attributes:
+      label: Which part of Grabbit?
+      options:
+        - Desktop app on Mac
+        - Desktop app on Windows
+        - Browser extension
+        - Grabbit website (self-hosted server)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Grabbit version
+      description: Shown at the top of the setup page (menu bar or tray icon › Set Up Browser Extension…).
+      placeholder: "1.0.0"
+  - type: input
+    id: site
+    attributes:
+      label: Website
+      description: Which site were you downloading from? A public example link helps a lot.
+      placeholder: "https://www.youtube.com/watch?v=…"
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and the exact error message if there was one.
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Computer and browser
+      placeholder: "macOS 15 on an M2 MacBook, Chrome 157"
+  - type: textarea
+    id: log
+    attributes:
+      label: Log (optional)
+      description: |
+        The last 20–30 lines of `grabbit.log`, from `~/Library/Application Support/Grabbit` (Mac) or `%LOCALAPPDATA%\Grabbit` (Windows).
+        Check it for private links before pasting.
+      render: text

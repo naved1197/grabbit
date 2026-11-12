@@ -41,9 +41,9 @@ The page then says **You're all set**. After that, the person only ever sees the
 
 ## Building the installers
 
-The easiest way is GitHub Actions: put this whole `Grabbit` folder in a GitHub repository, open
+The easiest way is GitHub Actions: on [github.com/naved1197/grabbit](https://github.com/naved1197/grabbit), open
 **Actions › Desktop app › Run workflow**, and download the three installers when it finishes.
-Pushing a tag like `v1.0.0` also publishes them as a GitHub Release. See `.github/workflows/desktop.yml`.
+Pushing a new version tag such as `v1.0.1` also publishes them as a GitHub Release. See `.github/workflows/desktop.yml`.
 
 To build on your own computer you need [uv](https://docs.astral.sh/uv/):
 

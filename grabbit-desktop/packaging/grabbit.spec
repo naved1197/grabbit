@@ -94,6 +94,6 @@ if IS_MAC:
             "LSUIElement": True,            # menu bar app: no Dock icon
             "LSMinimumSystemVersion": "11.0",
             "NSHighResolutionCapable": True,
-            "NSHumanReadableCopyright": "Grabbit",
+            "NSHumanReadableCopyright": "© 2026 Cubehole. MIT License.",
         },
     )

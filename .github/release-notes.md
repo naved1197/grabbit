@@ -25,3 +25,5 @@ Not sure which Mac you have? Open the Apple menu › **About This Mac**. "Chip: 
 Grabbit then runs quietly in the menu bar (Mac) or system tray (Windows), starts when you log in, and keeps its download engine (yt-dlp) up to date by itself.
 
 DRM-protected video (Netflix, Prime Video, Disney+, Spotify) can't be downloaded. Please respect each site's terms and copyright.
+
+Found a problem? [Report it here](https://github.com/naved1197/grabbit/issues/new/choose). Made by [Cubehole](https://cubehole.com) · [MIT License](https://github.com/naved1197/grabbit/blob/main/LICENSE)

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Download Grabbit
+    url: https://github.com/naved1197/grabbit/releases/latest
+    about: The latest Mac and Windows installers, with install steps.
+  - name: Cubehole
+    url: https://cubehole.com
+    about: The team behind Grabbit.
