@@ -1,0 +1,19 @@
+# docker compose up -d   ->   http://your-server:8000
+services:
+  grabbit:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      GRABBIT_FILE_TTL_MIN: "60"
+      GRABBIT_MAX_CONCURRENT: "3"
+      # Behind Nginx/Caddy/Cloudflare? Uncomment so rate limits see real visitor IPs:
+      # GRABBIT_TRUST_PROXY_HEADERS: "true"
+      # YouTube asking the server to "sign in"? Put a cookies.txt in the volume:
+      # GRABBIT_COOKIES_FILE: /data/cookies.txt
+    volumes:
+      - grabbit-data:/data
+    restart: unless-stopped
+
+volumes:
+  grabbit-data:

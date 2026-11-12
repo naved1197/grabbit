@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Grabbit · Download any video</title>
+  <meta name="description" content="Paste a link, pick a quality, save the file. Works with YouTube, TikTok, Instagram, X, Reddit, Vimeo and 1,800+ other sites.">
+  <meta name="theme-color" content="#f6f6fb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0c0d12" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/theme.js"></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5"/><path d="M5 19h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+    <symbol id="i-retry" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-cookie" viewBox="0 0 24 24"><path d="M21 12.5A9 9 0 1 1 11.5 3a3 3 0 0 0 3.5 3.5 3 3 0 0 0 3 3 3 3 0 0 0 3 3z"/><path d="M8.5 9.5h.01M8 15h.01M12.5 13h.01M15.5 16.5h.01"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4m0 0-4.5 4.5M12 4l4.5 4.5"/><path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Grabbit home">
+      <img src="/favicon.svg" alt="" width="30" height="30">
+      <span>Grabbit</span>
+    </a>
+    <button id="theme-toggle" class="icon-btn" type="button" aria-label="Switch to dark mode" title="Toggle theme">
+      <svg class="icon theme-light"><use href="#i-moon"/></svg>
+      <svg class="icon theme-dark"><use href="#i-sun"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Download <span class="accent">any video.</span></h1>
+      <p class="lede">Paste a link from YouTube, TikTok, Instagram, X, Reddit, Vimeo, or any of 1,800+ other sites. Pick a quality and save it.</p>
+
+      <form id="lookup-form" class="search" novalidate>
+        <svg class="icon search-icon" aria-hidden="true"><use href="#i-link"/></svg>
+        <label class="visually-hidden" for="url">Video link</label>
+        <input id="url" name="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"
+               placeholder="Paste a video link…" enterkeyhint="go">
+        <button id="paste-btn" class="btn ghost paste" type="button" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Paste</span>
+        </button>
+        <button id="go-btn" class="btn primary" type="submit">
+          <span class="btn-label">Get video</span>
+          <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </button>
+      </form>
+      <div id="form-error" class="form-error" role="alert" hidden></div>
+
+      <div id="cookie-bar" class="cookie-bar" hidden>
+        <button id="cookie-btn" class="cookie-chip" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#i-cookie"/></svg>
+          <span id="cookie-label">Private or sign-in only video? Add cookies</span>
+        </button>
+        <button id="cookie-clear" class="icon-btn small" type="button" aria-label="Remove cookies" title="Remove cookies" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
+      </div>
+
+      <ul class="sites" aria-label="Popular sites">
+        <li>YouTube</li><li>TikTok</li><li>Instagram</li><li>X / Twitter</li><li>Reddit</li><li>Vimeo</li><li>Facebook</li><li>Twitch</li><li>SoundCloud</li>
+        <li><a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md" target="_blank" rel="noopener noreferrer">+1,800 more</a></li>
+      </ul>
+    </section>
+
+    <section id="result" class="card result" hidden aria-live="polite"></section>
+
+    <section id="downloads" class="downloads" hidden aria-labelledby="downloads-title">
+      <div class="section-head">
+        <h2 id="downloads-title">Your downloads</h2>
+        <div class="section-tools">
+          <label class="switch">
+            <input id="autosave" type="checkbox" checked>
+            <span class="switch-track" aria-hidden="true"></span>
+            <span>Save automatically</span>
+          </label>
+          <button id="clear-done" class="link-btn" type="button">Clear finished</button>
+        </div>
+      </div>
+      <ol id="job-list" class="job-list"></ol>
+    </section>
+
+    <section class="steps" aria-label="How it works">
+      <div class="step"><span class="step-n">1</span><div><h3>Paste a link</h3><p>Copy the address of any video page, or share it to Grabbit from your phone.</p></div></div>
+      <div class="step"><span class="step-n">2</span><div><h3>Pick a quality</h3><p>Choose up to 4K video, or grab just the audio as MP3.</p></div></div>
+      <div class="step"><span class="step-n">3</span><div><h3>Save the file</h3><p>The file lands in your Downloads folder. No account and no app needed.</p></div></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Powered by <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener noreferrer">yt-dlp</a><span id="ytdlp-version"></span>.
+      Files are deleted from the server <span id="ttl-note">after an hour</span>.</p>
+    <p class="fine">Only download videos you own or have permission to save. Respect creators and each site's terms.</p>
+  </footer>
+
+  <dialog id="cookie-dialog" class="dialog" aria-labelledby="cookie-title">
+    <form method="dialog" class="dialog-body">
+      <div class="dialog-head">
+        <h2 id="cookie-title">Use your cookies</h2>
+        <button class="icon-btn" value="cancel" aria-label="Close">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
+      </div>
+      <p class="dialog-lede">Private, follower-only, members-only and age-restricted videos need a signed-in account.
+        Export the cookies from a browser where you're signed in and add them here.</p>
+
+      <div id="cookie-current" class="cookie-current" hidden></div>
+
+      <ol class="howto">
+        <li>Install a cookie exporter:
+          <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank" rel="noopener noreferrer">Get cookies.txt LOCALLY</a>
+          for Chrome / Edge, or
+          <a href="https://addons.mozilla.org/firefox/addon/get-cookies-txt-locally/" target="_blank" rel="noopener noreferrer">for Firefox</a>.</li>
+        <li>Open the site (for example <b>instagram.com</b>) and make sure you're signed in.</li>
+        <li>Click the extension, choose <b>Export</b>, then add the file below.</li>
+      </ol>
+
+      <label id="cookie-drop" class="drop">
+        <input id="cookie-file" type="file" accept=".txt,.json,text/plain,application/json">
+        <svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg>
+        <span><strong>Choose cookies.txt</strong> or drop it here</span>
+      </label>
+
+      <label class="field-label" for="cookie-text">Or paste the contents</label>
+      <textarea id="cookie-text" rows="5" spellcheck="false" autocomplete="off"
+                placeholder="# Netscape HTTP Cookie File&#10;.instagram.com  TRUE  /  TRUE  1793000000  sessionid  …"></textarea>
+      <p id="cookie-status" class="cookie-status" role="status"></p>
+
+      <div class="notice info">
+        <svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>
+        <span>Cookies stay in this browser and are sent only with your own requests. The server uses them for that
+          one lookup or download, then deletes them. They give access to your account, so only add them to a
+          Grabbit you trust, or use a second account. <b>YouTube tip:</b> export from a private window, then close it,
+          so the cookies keep working.</span>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="cookie-remove" type="button" class="btn ghost small danger-text" hidden>Remove cookies</button>
+        <span class="spacer"></span>
+        <button value="cancel" class="btn soft small">Cancel</button>
+        <button id="cookie-save" type="button" class="btn primary small">Save cookies</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Render Blueprint: New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: grabbit
+    runtime: docker
+    plan: starter
+    healthCheckPath: /healthz
+    numInstances: 1          # keep at 1: download progress lives in memory
+    envVars:
+      - key: GRABBIT_TRUST_PROXY_HEADERS
+        value: "true"
+      - key: GRABBIT_MAX_FILESIZE_MB
+        value: "2048"

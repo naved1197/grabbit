@@ -1,0 +1,19 @@
+Grabbit includes these programs, each under its own license:
+
+yt-dlp           The Unlicense (public domain)        https://github.com/yt-dlp/yt-dlp
+yt-dlp-ejs       The Unlicense                        https://github.com/yt-dlp/ejs
+Deno             MIT License                          https://github.com/denoland/deno
+Python           Python Software Foundation License   https://www.python.org
+FastAPI, Starlette, Uvicorn, Pydantic, pystray (LGPL-3.0), Pillow, PyObjC,
+curl_cffi, websockets, requests, certifi (MPL-2.0), mutagen (GPL-2.0+),
+pycryptodomex, brotli: see each project's page on https://pypi.org
+
+FFmpeg (ffmpeg and ffprobe)
+  Licensed under the GNU General Public License, version 3 (these builds
+  include GPL components such as x264).
+  Source code: https://ffmpeg.org/download.html#get-sources
+  macOS builds: https://ffmpeg.martin-riedl.de  (build scripts and sources listed there)
+  Windows builds: https://www.gyan.dev/ffmpeg/builds/  (build scripts and sources listed there)
+  The exact version is printed by running the bundled ffmpeg with -version.
+  If you received Grabbit from someone, you can ask them for the
+  corresponding FFmpeg source code, or download it from the links above.

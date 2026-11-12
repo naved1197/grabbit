@@ -1,0 +1,86 @@
+# Builds the Grabbit desktop installers:
+#   Grabbit-<version>-mac-apple-silicon.dmg, Grabbit-<version>-mac-intel.dmg, Grabbit-Setup-<version>.exe
+# Run it from the Actions tab ("Run workflow"), or push a tag like v1.0.0 to also publish a GitHub Release.
+name: Desktop app
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15          # Apple Silicon
+            name: mac-apple-silicon
+          - os: macos-15-intel    # Intel Macs
+            name: mac-intel
+          - os: windows-2025
+            name: windows
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: grabbit-desktop
+    env:
+      UV_PYTHON_PREFERENCE: only-system   # build with the python.org Python from setup-python
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Test
+        run: |
+          uv sync --locked
+          uv run pytest -q
+
+      - name: Build Mac app
+        if: runner.os == 'macOS'
+        run: ./packaging/build_mac.sh
+
+      - name: Install Inno Setup
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Build Windows installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./packaging/build_windows.ps1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grabbit-${{ matrix.name }}
+          path: |
+            grabbit-desktop/dist/*.dmg
+            grabbit-desktop/dist/*.exe
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" out/* --repo "$GITHUB_REPOSITORY" \
+            --title "Grabbit $GITHUB_REF_NAME" \
+            --notes "Mac: open the .dmg and drag Grabbit into Applications. Windows: run Grabbit-Setup.exe. See grabbit-desktop/README.md for first-launch steps."

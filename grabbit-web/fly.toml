@@ -1,0 +1,25 @@
+# Fly.io: `fly launch --copy-config --no-deploy`, then `fly deploy` and `fly scale count 1`.
+app = "grabbit-change-me"
+primary_region = "iad"
+
+[env]
+  GRABBIT_TRUST_PROXY_HEADERS = "true"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "30s"
+    method = "GET"
+    path = "/healthz"
+    timeout = "5s"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

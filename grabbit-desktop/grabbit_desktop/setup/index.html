@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Set Up Grabbit</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/desktop/assets/setup.css">
+  <script src="/desktop/assets/setup.js" defer></script>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <img src="/favicon.svg" alt="" class="logo" width="40" height="40">
+      <div>
+        <h1>Grabbit</h1>
+        <p class="sub" id="version">Download videos, audio and images from any site</p>
+      </div>
+    </header>
+
+    <section class="card status-card" aria-live="polite">
+      <div class="row">
+        <span class="dot ok" aria-hidden="true"></span>
+        <div class="grow">
+          <h2 class="h-small">Grabbit is running on this computer</h2>
+          <p class="muted" id="where">It lives in your menu bar and starts by itself when you log in.</p>
+        </div>
+      </div>
+      <label class="switch" id="autostart-row" hidden>
+        <input type="checkbox" id="autostart">
+        <span class="track" aria-hidden="true"><span class="thumb"></span></span>
+        <span>Start Grabbit when I log in</span>
+      </label>
+    </section>
+
+    <!-- Shown once the extension has said hello -->
+    <section class="card done-card" id="done" hidden>
+      <div class="row">
+        <span class="check" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <div class="grow">
+          <h2>You're all set</h2>
+          <p>Hover over any video, image or audio player on a website and click <strong>Download</strong>.
+            The file lands in your Downloads folder.</p>
+        </div>
+      </div>
+      <ul class="tips">
+        <li><strong>Pin Grabbit</strong> so it's one click away: click the puzzle-piece icon in the browser's toolbar,
+          then the pin next to Grabbit.</li>
+        <li>Prefer pasting a link? <a href="/" id="web-link">Open the Grabbit website</a>.</li>
+      </ul>
+      <p class="muted small">You can close this tab. Grabbit keeps running in the background.</p>
+    </section>
+
+    <!-- The steps -->
+    <section class="card" id="steps-card">
+      <details id="steps-wrap" open>
+        <summary class="steps-summary">
+          <h2 id="steps-title">Add the Download button to your browser</h2>
+          <span class="muted small" id="steps-hint">One time only. Takes about 30 seconds.</span>
+        </summary>
+
+        <div id="no-browser" class="note warn" hidden>
+          No Chrome, Edge or Brave found. Install <a href="https://www.google.com/chrome/" rel="noopener" target="_blank">Google Chrome</a>,
+          then come back to this page. (Safari and Firefox can't use this extension; the
+          <a href="/">Grabbit website</a> works in any browser.)
+        </div>
+
+        <div id="browser-pick" class="pick" role="radiogroup" aria-label="Browser" hidden></div>
+
+        <ol class="steps">
+          <li>
+            <div class="step-head">Open the Extensions page</div>
+            <p class="muted">Click the button, then click <span class="b-name">your browser</span>'s address bar,
+              paste <span class="paste-key">(Ctrl+V)</span> and press <span class="enter-key">Enter</span>.</p>
+            <button class="btn primary" id="open-ext" type="button">Copy address &amp; open <span class="b-name">browser</span></button>
+            <p class="muted small" id="manual-url">The address is <code id="ext-url">chrome://extensions</code>.
+              You can also find Extensions in the browser's menu.</p>
+          </li>
+          <li>
+            <div class="step-head">Turn on <strong>Developer mode</strong></div>
+            <p class="muted">The switch is at the <span id="dev-hint">top right of the page</span>.</p>
+          </li>
+          <li>
+            <div class="step-head">Drag the <strong>Grabbit Extension</strong> folder onto the Extensions page</div>
+            <button class="btn primary" id="show-folder" type="button">Show the folder</button>
+            <p class="muted small more">Or click <strong>Load unpacked</strong> and choose that folder.
+              <span id="picker-hint"></span></p>
+            <div class="path-row">
+              <code class="path" id="ext-path">…</code>
+              <button class="btn" id="copy-path" type="button">Copy path</button>
+            </div>
+          </li>
+        </ol>
+
+        <div class="waiting" id="waiting">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Waiting for the extension… this page updates by itself.</span>
+        </div>
+      </details>
+    </section>
+
+    <footer class="foot muted small" id="foot"></footer>
+  </main>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

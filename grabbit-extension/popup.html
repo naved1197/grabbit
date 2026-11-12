@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Grabbit</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <img src="icons/icon32.png" alt="" width="24" height="24">
+    <strong>Grabbit</strong>
+    <span id="server-pill" class="pill" title="Grabbit server">Checking…</span>
+  </header>
+
+  <div id="offline" class="banner" hidden>
+    <p>Can't reach your Grabbit server at <b id="offline-url"></b>. Images and plain video files still download;
+      streaming sites (YouTube, Instagram, X…) need the server running.</p>
+    <button id="offline-settings" class="link" type="button">Change address</button>
+  </div>
+
+  <section class="card page">
+    <p class="eyebrow" id="page-host">This page</p>
+    <p class="page-title" id="page-title">…</p>
+    <div class="row">
+      <button id="page-video" class="btn primary" type="button">Download video</button>
+      <button id="page-audio" class="btn soft" type="button">Audio (MP3)</button>
+    </div>
+  </section>
+
+  <section id="found" class="found">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="videos" aria-selected="true">Videos <span id="n-videos">0</span></button>
+      <button role="tab" data-tab="images" aria-selected="false">Images <span id="n-images">0</span></button>
+      <button role="tab" data-tab="audio" aria-selected="false">Audio <span id="n-audio">0</span></button>
+    </div>
+    <div id="panel" class="panel"></div>
+    <p id="found-note" class="note" hidden></p>
+  </section>
+
+  <section id="jobs-section" class="jobs-section" hidden>
+    <div class="section-head">
+      <h2>Downloads</h2>
+      <button id="clear-jobs" class="link" type="button">Clear</button>
+    </div>
+    <ol id="jobs" class="jobs"></ol>
+  </section>
+
+  <details id="settings" class="settings">
+    <summary>Settings</summary>
+    <label class="field">
+      <span>Grabbit server address</span>
+      <span class="row">
+        <input id="server" type="url" spellcheck="false" placeholder="http://localhost:8000">
+        <button id="test-server" class="btn soft small" type="button">Test</button>
+      </span>
+      <small id="server-result"></small>
+    </label>
+    <label class="toggle"><input id="sendCookies" type="checkbox"> <span>Use my logins for the video's site<small>Sends that site's cookies to your Grabbit server so private and follower-only videos work</small></span></label>
+    <label class="toggle"><input id="showOnVideos" type="checkbox"> <span>Show button on videos</span></label>
+    <label class="toggle"><input id="showOnImages" type="checkbox"> <span>Show button on images</span></label>
+    <div class="grid2">
+      <label class="field"><span>Video quality</span>
+        <select id="quality">
+          <option value="best">Best available</option>
+          <option value="2160">Up to 4K</option>
+          <option value="1080">Up to 1080p</option>
+          <option value="720">Up to 720p</option>
+          <option value="480">Up to 480p</option>
+        </select>
+      </label>
+      <label class="field"><span>Video format</span>
+        <select id="container">
+          <option value="mp4">MP4</option>
+          <option value="webm">WebM</option>
+          <option value="mkv">MKV</option>
+        </select>
+      </label>
+      <label class="field"><span>Audio format</span>
+        <select id="audioFormat">
+          <option value="mp3">MP3</option>
+          <option value="m4a">M4A</option>
+          <option value="opus">Opus</option>
+          <option value="best">Original</option>
+        </select>
+      </label>
+      <label class="field"><span>Smallest image (px)</span>
+        <input id="minImageSize" type="number" min="40" max="1000" step="10">
+      </label>
+    </div>
+  </details>
+</body>
+</html>

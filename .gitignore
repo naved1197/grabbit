@@ -1,0 +1,8 @@
+# Each project folder has its own .gitignore for venvs, caches and build output.
+.DS_Store
+
+# Local Claude Code settings (preview servers, permissions)
+.claude/
+
+# Separate Flet app with its own git repository
+grabbit/
