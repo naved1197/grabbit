@@ -30,13 +30,13 @@ jobs:
     env:
       UV_PYTHON_PREFERENCE: only-system   # build with the python.org Python from setup-python
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
 
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10
 
       - name: Test
         run: |
@@ -58,7 +58,7 @@ jobs:
         shell: pwsh
         run: ./packaging/build_windows.ps1
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: grabbit-${{ matrix.name }}
           path: |
@@ -73,7 +73,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github
+      - uses: actions/download-artifact@v8
         with:
           path: out
           merge-multiple: true
@@ -82,5 +85,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" out/* --repo "$GITHUB_REPOSITORY" \
-            --title "Grabbit $GITHUB_REF_NAME" \
-            --notes "Mac: open the .dmg and drag Grabbit into Applications. Windows: run Grabbit-Setup.exe. See grabbit-desktop/README.md for first-launch steps."
+            --title "Grabbit $GITHUB_REF_NAME" --notes-file .github/release-notes.md
