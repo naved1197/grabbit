@@ -82,7 +82,22 @@
             <div class="step-head">Turn on <strong>Developer mode</strong></div>
             <p class="muted">The switch is at the <span id="dev-hint">top right of the page</span>.</p>
           </li>
-          <li>
+          <!-- Mac: the file picker reaches Applications (where the folder usually is) and the
+               Desktop (where "Put it on my Desktop" adds a link to it) from its sidebar -->
+          <li id="step-mac" hidden>
+            <div class="step-head">Click <strong>Load unpacked</strong> and choose <strong>Grabbit Extension</strong></div>
+            <p class="muted" id="mac-first" hidden>First click <strong>Put it on my Desktop</strong> below.</p>
+            <p class="muted">The button shows up near the top of the page once Developer mode is on. In the window that opens,
+              click <strong id="mac-place">Applications</strong> in the sidebar, select <strong>Grabbit Extension</strong>,
+              then click <strong>Select</strong>.</p>
+            <div class="btn-row">
+              <button class="btn" id="put-desktop" type="button">Put it on my Desktop</button>
+              <button class="btn" id="show-folder-mac" type="button">Show it in Finder</button>
+            </div>
+            <p class="muted small more" id="mac-note"></p>
+          </li>
+          <!-- Windows: the folder is in the hidden data folder -->
+          <li id="step-hidden">
             <div class="step-head">Drag the <strong>Grabbit Extension</strong> folder onto the Extensions page</div>
             <button class="btn primary" id="show-folder" type="button">Show the folder</button>
             <p class="muted small more">Or click <strong>Load unpacked</strong> and choose that folder.

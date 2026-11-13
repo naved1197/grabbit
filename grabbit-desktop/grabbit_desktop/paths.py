@@ -18,6 +18,7 @@ _PROJECT = Path(__file__).resolve().parent.parent
 _REPO = _PROJECT.parent
 
 DEFAULT_PORT = 8000  # the browser extension's default server is http://localhost:8000
+EXTENSION_FOLDER = "Grabbit Extension"
 
 
 def port() -> int:
@@ -72,9 +73,16 @@ def data_dir() -> Path:
 
 
 def extension_dir() -> Path:
-    # The folder users load into their browser. Its path must never change,
-    # because the browser remembers unpacked extensions by path.
-    return data_dir() / "Grabbit Extension"
+    # The extension folder inside the data folder: used on Windows, in test runs, and on
+    # Macs where Grabbit 1.0 already put it. The packaged Mac app otherwise puts it next to
+    # itself in Applications; see extension.choose_folder, which also keeps the choice.
+    return data_dir() / EXTENSION_FOLDER
+
+
+def user_desktop() -> Path:
+    """The person's Desktop folder (a Desktop inside the test home for test runs)."""
+    override = os.environ.get("GRABBIT_DESKTOP_HOME")
+    return Path(override) / "Desktop" if override else Path.home() / "Desktop"
 
 
 def downloads_dir() -> Path:

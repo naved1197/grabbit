@@ -222,14 +222,15 @@ def main(argv: list[str] | None = None) -> int:
     updater = Updater(paths.updates_dir())
     updater.activate()
     state = paths.State()
+    extension_dir = extension.choose_folder(state)
     try:
-        extension.sync(paths.extension_source(), paths.extension_dir(), port)
+        extension.sync(paths.extension_source(), extension_dir, port)
     except OSError:
         log.exception("couldn't update the extension folder")
 
     from .controller import Desktop
 
-    desktop = Desktop(port, state, updater)
+    desktop = Desktop(port, state, updater, extension_dir)
     try:
         srv = server.ServerThread(server.create_app(desktop), sock)
         started = srv.start()

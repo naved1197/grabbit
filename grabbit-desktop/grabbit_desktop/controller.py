@@ -9,19 +9,21 @@ import sys
 import threading
 import time
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
-from . import VERSION, paths, system
+from . import VERSION, extension, paths, system
 from .updater import Updater
 
 log = logging.getLogger("grabbit.desktop")
 
 
 class Desktop:
-    def __init__(self, port: int, state: paths.State, updater: Updater):
+    def __init__(self, port: int, state: paths.State, updater: Updater, extension_dir: Path | None = None):
         self.port = port
         self.state = state
         self.updater = updater
+        self.extension_dir = extension_dir or extension.choose_folder(state)
         self.token = secrets.token_urlsafe(24)
         self.restart_requested = False
         self.on_quit: Callable[[], None] | None = None  # set by the tray icon
@@ -50,6 +52,16 @@ class Desktop:
     def extension_connected(self) -> bool:
         return bool(self.state.get("extension"))
 
+    def desktop_shortcut(self) -> Path | None:
+        """The link "Put it on my Desktop" made, if it's still there.
+
+        Only looks at the Desktop after that button was used: macOS asks the person before
+        an app may touch their Desktop, and a status check shouldn't be what triggers that.
+        """
+        saved = self.state.get("desktop_shortcut")
+        link = Path(saved) if isinstance(saved, str) and saved else None
+        return link if link and extension.is_shortcut_to(link, self.extension_dir) else None
+
     def status(self) -> dict[str, Any]:
         ext = self.state.get("extension") or {}
         return {
@@ -59,7 +71,11 @@ class Desktop:
             "pid": os.getpid(),
             "platform": "mac" if paths.IS_MAC else "windows" if paths.IS_WINDOWS else "other",
             "extension": {"connected": bool(ext), "version": ext.get("version"), "at": ext.get("at")},
-            "extension_dir": str(paths.extension_dir()),
+            "extension_dir": str(self.extension_dir),
+            # "applications": Mac file pickers list it in their sidebar; "hidden": the path must be typed
+            "extension_place": "applications" if self.extension_dir.parent == extension.APPLICATIONS else "hidden",
+            "desktop_shortcut": {"supported": extension.shortcuts_supported(),
+                                 "path": str(link) if (link := self.desktop_shortcut()) else None},
             "browsers": [b.public() for b in self.browsers()],
             "autostart": {"supported": system.autostart_supported(), "enabled": system.autostart_enabled()},
             "ytdlp": {"version": self.updater.active_version, "update_ready": self.updater.pending_version},
@@ -72,7 +88,31 @@ class Desktop:
         self.state.update(extension={"version": version, "at": int(time.time())})
         if first:
             log.info("browser extension connected (version %s)", version or "?")
+        self.remove_desktop_shortcut()  # the browser remembers the real folder, not the link
         self._changed()
+
+    def put_on_desktop(self) -> Path:
+        """Put a link to the extension folder on the Desktop, where every file picker reaches it.
+
+        Raises OSError, PermissionError if macOS (or the person) said no. The first time,
+        this waits while macOS asks whether Grabbit may use the Desktop.
+        """
+        link = self.desktop_shortcut() or extension.make_shortcut(self.extension_dir, paths.user_desktop())
+        self.state.update(desktop_shortcut=str(link))
+        log.info("put a link to the extension folder on the Desktop: %s", link)
+        return link
+
+    def remove_desktop_shortcut(self) -> None:
+        link = self.desktop_shortcut()
+        if link:
+            try:
+                link.unlink()
+                log.info("removed the extension link from the Desktop")
+            except OSError:
+                log.warning("couldn't remove %s", link, exc_info=True)
+                return
+        if self.state.get("desktop_shortcut"):
+            self.state.update(desktop_shortcut=None)
 
     def open_browser(self, browser_id: str) -> bool:
         browser = next((b for b in self.browsers() if b.id == browser_id), None)
@@ -82,7 +122,7 @@ class Desktop:
         return True
 
     def reveal_extension(self) -> None:
-        system.reveal(paths.extension_dir())
+        system.reveal(self.extension_dir)
 
     def set_autostart(self, enabled: bool) -> bool:
         result = system.set_autostart(enabled)

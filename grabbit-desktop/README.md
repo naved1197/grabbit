@@ -16,7 +16,7 @@ drags the extension folder onto the browser's Extensions page once. The setup pa
 
 ## Sharing it: what to tell people
 
-**Mac** (`Grabbit-1.0.0-mac-apple-silicon.dmg`, or `-intel` for older Macs)
+**Mac** (`Grabbit-1.1.0-mac-apple-silicon.dmg`, or `-intel` for older Macs)
 
 1. Open the .dmg and drag **Grabbit** into **Applications**.
 2. Open Grabbit from Applications. macOS says it can't check it for malware, because it isn't
@@ -25,7 +25,7 @@ drags the extension folder onto the browser's Extensions page once. The setup pa
    "Grabbit was blocked". Confirm with your password. This is only needed the first time.
 3. A setup page opens in the browser. Follow its three steps.
 
-**Windows** (`Grabbit-Setup-1.0.0.exe`)
+**Windows** (`Grabbit-Setup-1.1.0.exe`)
 
 1. Run the installer. If Windows says "Windows protected your PC", click **More info** and then
    **Run anyway** (the installer isn't signed with a paid certificate).
@@ -35,7 +35,9 @@ drags the extension folder onto the browser's Extensions page once. The setup pa
 
 1. Click **Copy address & open Chrome**, then paste into Chrome's address bar and press Enter.
 2. Turn on **Developer mode** on the Extensions page.
-3. Click **Show the folder** and drag **Grabbit Extension** onto the Extensions page.
+3. Mac: click **Load unpacked**, then **Applications** in the sidebar, pick **Grabbit Extension**
+   and click **Select**. (Or click **Put it on my Desktop** first and pick it from **Desktop**.)
+   Windows: click **Show the folder** and drag **Grabbit Extension** onto the Extensions page.
 
 The page then says **You're all set**. After that, the person only ever sees the Download buttons.
 
@@ -95,10 +97,23 @@ Grabbit.app / Grabbit.exe
 * Finished files are staged in the data folder and saved to Downloads by the browser, then deleted.
 
 **Data folder:** `~/Library/Application Support/Grabbit` (Mac) or `%LOCALAPPDATA%\Grabbit` (Windows).
-It holds the `Grabbit Extension` folder, staged downloads, yt-dlp updates and `grabbit.log`.
+It holds staged downloads, yt-dlp updates and `grabbit.log`, and on Windows the `Grabbit Extension` folder.
+
+**Extension folder:** on a Mac it's `/Applications/Grabbit Extension`, right next to Grabbit, because
+every file picker lists Applications in its sidebar (the data folder is hidden inside `~/Library`).
+Where it goes is decided once and saved in `state.json`, since the browser remembers the extension
+by its folder's path. Macs that loaded it from the data folder with Grabbit 1.0 keep using that one,
+as do test runs with `GRABBIT_DESKTOP_HOME` and copies of Grabbit that aren't in /Applications.
+
+**Put it on my Desktop** (Mac) puts a link to that folder on the Desktop, not a copy. When a browser
+loads an unpacked extension it follows the link and remembers the real folder (Chromium runs the
+path through `realpath`), so Grabbit keeps updating it, and Grabbit deletes the link once the
+extension says hello. A copy would become the extension's home, never get updates, and break the
+extension when someone tidied their Desktop. The first use shows macOS's "access files in your
+Desktop folder" prompt. Windows doesn't get the button: browsers there remember the link itself.
 
 **Uninstall:** on Windows use *Settings › Apps* (this removes the data folder too). On a Mac, quit
-Grabbit from the menu bar, delete it from Applications, and delete the data folder and
+Grabbit from the menu bar, delete it and `Grabbit Extension` from Applications, and delete the data folder and
 `~/Library/LaunchAgents/com.grabbit.desktop.plist`. Then remove the extension in the browser.
 
 ## Developing

@@ -16,12 +16,12 @@ async function api(path, body) {
   return res.json();
 }
 
-function toast(text) {
+function toast(text, ms = 2600) {
   const t = $("#toast");
   t.textContent = text;
   t.hidden = false;
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => { t.hidden = true; }, 2600);
+  toast.timer = setTimeout(() => { t.hidden = true; }, ms);
 }
 
 function browser() {
@@ -56,6 +56,21 @@ function render() {
   $("#autostart-row").hidden = !auto.supported;
   $("#autostart").checked = auto.enabled;
 
+  // Mac: Applications or Desktop, both in the file picker's sidebar. Windows: paste the path.
+  const inApps = status.extension_place === "applications";
+  const shortcut = status.desktop_shortcut && status.desktop_shortcut.path;
+  $("#step-mac").hidden = !mac;
+  $("#step-hidden").hidden = mac;
+  $("#mac-first").hidden = inApps || !!shortcut;
+  $("#mac-place").textContent = inApps && !shortcut ? "Applications" : "Desktop";
+  const put = $("#put-desktop");
+  put.hidden = !!shortcut;
+  put.classList.toggle("primary", !inApps);
+  $("#mac-note").textContent = shortcut
+    ? "Grabbit Extension is on your Desktop (you can also drag it onto the Extensions page). " +
+      "Once the extension is added, Grabbit takes it off your Desktop. Your browser keeps using the original."
+    : inApps ? "Or drag the folder from Finder onto the Extensions page."
+      : "Or click Show it in Finder and drag the folder onto the Extensions page.";
   $("#ext-path").textContent = status.extension_dir;
   $(".paste-key").textContent = mac ? "(⌘V)" : "(Ctrl+V)";
   $(".enter-key").textContent = mac ? "Return" : "Enter";
@@ -140,7 +155,22 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#copy-path").addEventListener("click", async () => {
     if (await copy(status.extension_dir, $("#ext-path"))) toast("Folder path copied");
   });
-  $("#show-folder").addEventListener("click", () => api("/desktop/reveal", {}).catch(() => {}));
+  for (const id of ["#show-folder", "#show-folder-mac"]) {
+    $(id).addEventListener("click", () => api("/desktop/reveal", {}).catch(() => {}));
+  }
+  $("#put-desktop").addEventListener("click", async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;  // the first time, macOS asks whether Grabbit may use the Desktop
+    let r = null;
+    try { r = await api("/desktop/shortcut", {}); } catch { /* shown below */ }
+    btn.disabled = false;
+    if (r && r.ok) toast("Grabbit Extension is on your Desktop");
+    else if (r && r.error === "denied") {
+      toast("Grabbit isn't allowed to use your Desktop. Click Show it in Finder and drag the folder instead. " +
+        "(To allow it: System Settings › Privacy & Security › Files and Folders › Grabbit.)", 9000);
+    } else toast("Couldn't put it on your Desktop. Click Show it in Finder and drag the folder instead.", 6000);
+    refresh();
+  });
   $("#autostart").addEventListener("change", async (e) => {
     try {
       const r = await api("/desktop/autostart", { enabled: e.target.checked });

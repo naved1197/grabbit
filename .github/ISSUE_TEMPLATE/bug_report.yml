@@ -23,7 +23,7 @@ body:
     attributes:
       label: Grabbit version
       description: Shown at the top of the setup page (menu bar or tray icon › Set Up Browser Extension…).
-      placeholder: "1.0.0"
+      placeholder: "1.1.0"
   - type: input
     id: site
     attributes:

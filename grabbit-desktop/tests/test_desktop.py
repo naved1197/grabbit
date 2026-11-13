@@ -145,6 +145,76 @@ def test_real_extension_bundles():
     assert b"/desktop/hello" in files["background.js"]
 
 
+def test_extension_folder_goes_next_to_the_app(tmp_path, monkeypatch):
+    apps = extension.APPLICATIONS / paths.EXTENSION_FOLDER
+    monkeypatch.setattr(extension, "beside_app", lambda: apps)
+    state = paths.State(tmp_path / "state.json")
+    assert extension.choose_folder(state) == apps
+    # kept once picked, even if the app can't use Applications any more
+    monkeypatch.setattr(extension, "beside_app", lambda: None)
+    assert extension.choose_folder(state) == apps
+    d = Desktop(PORT, state, updater.Updater(tmp_path / "updates"))
+    assert d.status()["extension_dir"] == str(apps) and d.status()["extension_place"] == "applications"
+
+
+def test_extension_folder_stays_where_grabbit_1_0_put_it(tmp_path, monkeypatch):
+    monkeypatch.setattr(extension, "beside_app", lambda: extension.APPLICATIONS / paths.EXTENSION_FOLDER)
+    state = paths.State(tmp_path / "state.json")
+    state.update(installed_version="1.0.0", extension={"version": "1.0.0", "at": 1})  # already loaded
+    assert extension.choose_folder(state) == paths.extension_dir()
+    d = Desktop(PORT, state, updater.Updater(tmp_path / "updates"))
+    assert d.status()["extension_place"] == "hidden"
+
+
+def test_extension_folder_stays_in_data_folder_for_test_runs():
+    assert extension.beside_app() is None  # GRABBIT_DESKTOP_HOME is set and this isn't the packaged app
+
+
+needs_symlinks = pytest.mark.skipif(os.name == "nt", reason="symlinks need extra rights on Windows")
+
+
+@needs_symlinks
+def test_desktop_shortcut_never_replaces_real_files(tmp_path):
+    target, desk = tmp_path / "Applications" / "Grabbit Extension", tmp_path / "Desktop"
+    target.mkdir(parents=True)
+    desk.mkdir()
+    (desk / "Grabbit Extension").mkdir()  # someone's own copy
+    link = extension.make_shortcut(target, desk)
+    assert link.name == "Grabbit Extension 2" and extension.is_shortcut_to(link, target)
+    assert extension.make_shortcut(target, desk) == link  # same link again, not a third one
+    link.unlink()
+    link.symlink_to(tmp_path / "gone")  # broken link: replaced
+    assert extension.make_shortcut(target, desk) == link and extension.is_shortcut_to(link, target)
+
+
+@needs_symlinks
+def test_desktop_shortcut_route_and_cleanup(client, desktop, monkeypatch):
+    monkeypatch.setattr(extension, "shortcuts_supported", lambda: True)
+    assert client.post("/desktop/shortcut", json={}).status_code == 403  # setup page only
+    # no Desktop access until the button is used (macOS would ask the person)
+    assert client.get("/desktop/status").json()["desktop_shortcut"]["path"] is None
+    r = client.post("/desktop/shortcut", json={}, headers=PAGE).json()
+    link = Path(r["path"])
+    assert r["ok"] and link.parent == paths.user_desktop() and extension.is_shortcut_to(link, desktop.extension_dir)
+    assert client.get("/desktop/status").json()["desktop_shortcut"]["path"] == str(link)
+    # once the extension is added, the browser uses the real folder and the link goes
+    client.post("/desktop/hello", json={"version": "1.0.0"}, headers={"Origin": "chrome-extension://abcdef"})
+    assert not os.path.lexists(link)
+    assert client.get("/desktop/status").json()["desktop_shortcut"]["path"] is None
+
+
+def test_desktop_shortcut_unsupported_or_denied(client, desktop, monkeypatch):
+    monkeypatch.setattr(extension, "shortcuts_supported", lambda: False)
+    assert client.post("/desktop/shortcut", json={}, headers=PAGE).json() == {"ok": False, "error": "unsupported"}
+    monkeypatch.setattr(extension, "shortcuts_supported", lambda: True)
+
+    def denied(*_a):
+        raise PermissionError("Operation not permitted")
+
+    monkeypatch.setattr(extension, "make_shortcut", denied)
+    assert client.post("/desktop/shortcut", json={}, headers=PAGE).json() == {"ok": False, "error": "denied"}
+
+
 # --------------------------------------------------------------------------- updater
 
 

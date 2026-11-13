@@ -3,13 +3,78 @@
 from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path
 
+from . import paths, system
+
 log = logging.getLogger("grabbit.desktop")
+
+APPLICATIONS = Path("/Applications")
 
 DEFAULT_SERVER = b"http://localhost:8000"
 # Files that contain the extension's default server address.
 _HAS_SERVER_DEFAULT = {"background.js", "popup.js", "popup.html"}
+
+
+def beside_app() -> Path | None:
+    """/Applications/Grabbit Extension, right next to Grabbit.app (packaged Mac app only).
+
+    Every Mac file picker lists Applications in its sidebar, so "Load unpacked" reaches
+    the folder in one click. The data folder is hidden inside ~/Library.
+    """
+    if not paths.IS_MAC or os.environ.get("GRABBIT_DESKTOP_HOME"):  # test runs keep it in their own folder
+        return None
+    bundle = system.app_bundle()
+    if not bundle or bundle.parent != APPLICATIONS or not os.access(APPLICATIONS, os.W_OK):
+        return None
+    return APPLICATIONS / paths.EXTENSION_FOLDER
+
+
+def choose_folder(state: paths.State) -> Path:
+    """Where the extension folder lives. Picked once, then kept for good:
+    browsers remember an unpacked extension by its folder's path."""
+    saved = state.get("extension_dir")
+    if isinstance(saved, str) and saved:
+        return Path(saved)
+    in_data = paths.extension_dir()
+    # Grabbit 1.0 always used the data folder. If a browser already loaded it from there, stay.
+    folder = in_data if state.get("extension") else (beside_app() or in_data)
+    state.update(extension_dir=str(folder))
+    return folder
+
+
+def shortcuts_supported() -> bool:
+    # When loading an unpacked extension, browsers on macOS follow a link to the real folder
+    # (Chromium's UnpackedInstaller runs the path through realpath) and remember that one, so
+    # Grabbit keeps updating it and the link can go once it's loaded. On Windows they would
+    # remember the link itself, and deleting it would break the extension.
+    return paths.IS_MAC
+
+
+def is_shortcut_to(link: Path, target: Path) -> bool:
+    try:
+        return link.is_symlink() and link.resolve() == target.resolve()
+    except OSError:
+        return False
+
+
+def make_shortcut(target: Path, folder: Path) -> Path:
+    """Put a link to `target` in `folder` (the Desktop) and return it.
+
+    Never replaces a real file or folder: picks "Grabbit Extension 2" and so on instead.
+    """
+    folder.mkdir(parents=True, exist_ok=True)
+    for n in range(1, 100):
+        link = folder / (target.name if n == 1 else f"{target.name} {n}")
+        if is_shortcut_to(link, target):
+            return link
+        if link.is_symlink() and not link.exists():
+            link.unlink()  # a broken link, e.g. to an extension folder that has moved
+        if not os.path.lexists(link):
+            link.symlink_to(target, target_is_directory=True)
+            return link
+    raise FileExistsError(folder / target.name)
 
 
 def _skip(rel: Path) -> bool:

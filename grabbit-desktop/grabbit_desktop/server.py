@@ -16,7 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from . import paths
+from . import extension, paths
 
 if TYPE_CHECKING:
     from .controller import Desktop
@@ -95,6 +95,26 @@ def create_app(desktop: Desktop, allowed_hosts: list[str] | None = None) -> Fast
         from_setup_page(request)
         desktop.reveal_extension()
         return {"ok": True}
+
+    @desk.post("/desktop/shortcut")
+    def shortcut(request: Request) -> dict[str, Any]:
+        """Put a link to the extension folder on the Desktop.
+
+        A plain `def` so it runs in a worker thread: the first time, macOS holds the call
+        while it asks the person whether Grabbit may use the Desktop.
+        """
+        from_setup_page(request)
+        if not extension.shortcuts_supported():
+            return {"ok": False, "error": "unsupported"}
+        try:
+            link = desktop.put_on_desktop()
+        except PermissionError:
+            log.warning("not allowed to use the Desktop", exc_info=True)
+            return {"ok": False, "error": "denied"}
+        except OSError:
+            log.exception("couldn't put the extension link on the Desktop")
+            return {"ok": False, "error": "failed"}
+        return {"ok": True, "path": str(link)}
 
     @desk.post("/desktop/autostart")
     async def autostart(body: Toggle, request: Request) -> dict[str, bool]:

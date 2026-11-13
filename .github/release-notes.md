@@ -1,5 +1,10 @@
 Grabbit adds a **Download** button to videos, audio and images on any website, including YouTube, Instagram, X, TikTok, Reddit, Facebook, Vimeo and [1,800+ more](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md). Files go straight to your Downloads folder.
 
+## What's new in 1.1
+
+- **Easier extension setup on Mac.** The Grabbit Extension folder now sits in Applications, next to Grabbit, so the browser's file picker finds it in one click. A new **Put it on my Desktop** button puts a shortcut to it on your Desktop. Grabbit removes the shortcut once the extension is added.
+- If you already added the extension with Grabbit 1.0, nothing changes for you. Your browser keeps using the folder it has.
+
 ## Download
 
 | Your computer | File |

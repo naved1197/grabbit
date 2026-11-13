@@ -95,5 +95,7 @@ if IS_MAC:
             "LSMinimumSystemVersion": "11.0",
             "NSHighResolutionCapable": True,
             "NSHumanReadableCopyright": "© 2026 Cubehole. MIT License.",
+            # shown when "Put it on my Desktop" on the setup page first uses the Desktop
+            "NSDesktopFolderUsageDescription": "Grabbit puts a shortcut to its browser extension on your Desktop, so it's easy to find.",
         },
     )
