@@ -55,7 +55,7 @@ A setup page then opens and walks you through adding the extension to Chrome, Ed
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/setup-dark.png">
-    <img alt="Grabbit's setup page after the extension is added: You're all set" src="docs/screenshots/setup-light.png" width="600">
+    <img alt="Grabbit's setup page on a Mac: three steps to add the Download button to Google Chrome, with buttons to put the extension folder on the Desktop or show it in Finder" src="docs/screenshots/setup-light.png" width="600">
   </picture>
 </p>
 
