@@ -361,3 +361,47 @@ def test_long_best_mp4_prefers_an_apple_stream():
     assert ydl.params["format_sort"] == ["res"]
     JobManager._prefer_apple_friendly(job, ydl, long_vp9)
     assert ydl.params["format_sort"][0] == "vcodec:h264"
+
+
+# ------------------------------------------------ the Android app's engine
+
+def test_engine_imports_without_fastapi_or_pydantic():
+    """The Android app runs these modules on a Python that has neither."""
+    import subprocess
+    import sys
+    code = ("import sys; sys.modules.update(fastapi=None, pydantic=None, starlette=None)\n"
+            "import app.jobs, app.resolve, app.security, app.compat\n"
+            "from app.formats import DownloadChoice\n"
+            "assert DownloadChoice(quality='720p').quality == '720'\n")
+    subprocess.run([sys.executable, "-c", code], check=True, cwd=str(__import__("pathlib").Path(__file__).parents[1]))
+
+
+def test_tool_overrides(monkeypatch, tmp_path):
+    from app import compat, ytdl
+    fake = tmp_path / "libffmpeg.so"
+    fake.write_text("")
+    monkeypatch.setenv("GRABBIT_FFMPEG", str(fake))
+    assert ytdl.ffmpeg_path() == str(fake) == compat.ffmpeg()
+    monkeypatch.setenv("GRABBIT_FFMPEG", str(tmp_path / "missing"))
+    assert ytdl.ffmpeg_path() is None  # an override that doesn't exist means "no ffmpeg", not PATH
+
+
+def test_quickjs_runtime(monkeypatch, tmp_path):
+    from pathlib import Path
+    from app import ytdl
+    from app.config import load_settings
+    qjs = tmp_path / "libqjs.so"
+    qjs.write_text("")
+    for env in ("GRABBIT_DENO", "GRABBIT_NODE", "GRABBIT_BUN"):  # pretend none of the others exist
+        monkeypatch.setenv(env, str(tmp_path / "none"))
+    monkeypatch.setenv("GRABBIT_QJS", str(qjs))
+    assert ytdl.js_runtime() == "quickjs"
+    opts = ytdl.base_options(load_settings(), ytdl.YtdlLogger(), Path(tmp_path))
+    assert opts["js_runtimes"] == {"quickjs": {"path": str(qjs)}}
+
+
+def test_apple_compat_setting(monkeypatch):
+    from app.config import load_settings
+    assert load_settings().apple_compat is True
+    monkeypatch.setenv("GRABBIT_APPLE_COMPAT", "false")
+    assert load_settings().apple_compat is False

@@ -2,45 +2,59 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
-
 Mode = Literal["video", "audio"]
+MODES = ("video", "audio")
 VIDEO_CONTAINERS = ("mp4", "webm", "mkv")
 AUDIO_FORMATS = ("mp3", "m4a", "opus", "best")
 QUALITIES = ("best", "2160", "1440", "1080", "720", "480", "360", "240", "144")
 
 
-class DownloadChoice(BaseModel):
+# Plain checks (no pydantic) so the engine also runs on the Android app's bundled Python.
+# The web API's request models call the same functions (see main.py ChoiceFields).
+
+def check_mode(v: str) -> str:
+    v = str(v).lower()
+    if v not in MODES:
+        raise ValueError(f"mode must be one of {', '.join(MODES)}")
+    return v
+
+
+def check_quality(v: str) -> str:
+    v = str(v).lower().removesuffix("p")
+    if v not in QUALITIES:
+        raise ValueError(f"quality must be one of {', '.join(QUALITIES)}")
+    return v
+
+
+def check_container(v: str) -> str:
+    v = str(v).lower()
+    if v not in VIDEO_CONTAINERS:
+        raise ValueError(f"container must be one of {', '.join(VIDEO_CONTAINERS)}")
+    return v
+
+
+def check_audio_format(v: str) -> str:
+    v = str(v).lower()
+    if v not in AUDIO_FORMATS:
+        raise ValueError(f"audio_format must be one of {', '.join(AUDIO_FORMATS)}")
+    return v
+
+
+@dataclass
+class DownloadChoice:
     mode: Mode = "video"
-    quality: str = Field("best", description="best or a max height such as 1080")
+    quality: str = "best"  # best or a max height such as 1080
     container: str = "mp4"
     audio_format: str = "mp3"
 
-    @field_validator("quality")
-    @classmethod
-    def _quality(cls, v: str) -> str:
-        v = str(v).lower().removesuffix("p")
-        if v not in QUALITIES:
-            raise ValueError(f"quality must be one of {', '.join(QUALITIES)}")
-        return v
-
-    @field_validator("container")
-    @classmethod
-    def _container(cls, v: str) -> str:
-        v = v.lower()
-        if v not in VIDEO_CONTAINERS:
-            raise ValueError(f"container must be one of {', '.join(VIDEO_CONTAINERS)}")
-        return v
-
-    @field_validator("audio_format")
-    @classmethod
-    def _audio(cls, v: str) -> str:
-        v = v.lower()
-        if v not in AUDIO_FORMATS:
-            raise ValueError(f"audio_format must be one of {', '.join(AUDIO_FORMATS)}")
-        return v
+    def __post_init__(self) -> None:
+        self.mode = check_mode(self.mode)  # type: ignore[assignment]
+        self.quality = check_quality(self.quality)
+        self.container = check_container(self.container)
+        self.audio_format = check_audio_format(self.audio_format)
 
 
 def format_options(choice: DownloadChoice, has_ffmpeg: bool = True) -> dict[str, Any]:

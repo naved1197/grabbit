@@ -16,12 +16,13 @@ from __future__ import annotations
 import functools
 import json
 import os
-import shutil
 import subprocess
 import sys
 import threading
 from collections.abc import Callable
 from pathlib import Path
+
+from .ytdl import tool_path
 
 APPLE_AUDIO = {"aac", "mp3", "alac", "ac3", "eac3"}
 # Bitrate ceilings for the hardware encoder by picture height (bits/s).
@@ -38,11 +39,11 @@ def apple_codec(vcodec: str | None) -> bool:
 
 
 def ffmpeg() -> str | None:
-    return shutil.which("ffmpeg")
+    return tool_path("ffmpeg", "GRABBIT_FFMPEG")
 
 
 def ffprobe() -> str | None:
-    return shutil.which("ffprobe")
+    return tool_path("ffprobe", "GRABBIT_FFPROBE")
 
 
 def probe(path: Path) -> dict:

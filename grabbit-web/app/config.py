@@ -59,6 +59,9 @@ class Settings:
     allow_private_urls: bool
     # Use X-Forwarded-For for the visitor's IP (set when behind a reverse proxy).
     trust_proxy_headers: bool
+    # Re-encode MP4s that Apple devices can't play (VP9/AV1/Opus) to H.264/AAC.
+    # The Android app turns this off: phones play those, and software encoding is slow there.
+    apple_compat: bool = True
 
     @property
     def max_filesize_bytes(self) -> int | None:
@@ -82,4 +85,5 @@ def load_settings() -> Settings:
         proxy=_str("GRABBIT_PROXY"),
         allow_private_urls=_bool("GRABBIT_ALLOW_PRIVATE_URLS", False),
         trust_proxy_headers=_bool("GRABBIT_TRUST_PROXY_HEADERS", False),
+        apple_compat=_bool("GRABBIT_APPLE_COMPAT", True),
     )

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 import shutil
 import threading
@@ -56,15 +57,35 @@ class YtdlLogger:
         self._log.info("error: %s", msg)
 
 
+def tool_path(name: str, env: str) -> str | None:
+    """A program yt-dlp runs: the GRABBIT_* override if set (the Android app's bundled
+    binaries have library names like libffmpeg.so), else whatever is on PATH."""
+    override = os.environ.get(env, "").strip()
+    if override:
+        return override if os.path.isfile(override) else None
+    return shutil.which(name)
+
+
 def ffmpeg_path() -> str | None:
-    return shutil.which("ffmpeg")
+    return tool_path("ffmpeg", "GRABBIT_FFMPEG")
+
+
+# (yt-dlp runtime name, program, override variable), most preferred first
+_JS_RUNTIMES = (("deno", "deno", "GRABBIT_DENO"), ("node", "node", "GRABBIT_NODE"),
+                ("bun", "bun", "GRABBIT_BUN"), ("quickjs", "qjs", "GRABBIT_QJS"))
+
+
+def _find_js_runtime() -> tuple[str, str] | None:
+    for runtime, program, env in _JS_RUNTIMES:
+        path = tool_path(program, env)
+        if path:
+            return runtime, path
+    return None
 
 
 def js_runtime() -> str | None:
-    for name in ("deno", "node", "bun"):
-        if shutil.which(name):
-            return name
-    return None
+    found = _find_js_runtime()
+    return found[0] if found else None
 
 
 def base_options(
@@ -83,9 +104,14 @@ def base_options(
         "windowsfilenames": True,
         "cachedir": str(settings.download_dir.parent / "yt-dlp-cache"),
     }
-    runtime = js_runtime()
+    # Lookups need it too: without it yt-dlp assumes nothing can be merged (the Android app's
+    # ffmpeg isn't on PATH under that name).
+    ffmpeg = ffmpeg_path()
+    if ffmpeg:
+        opts["ffmpeg_location"] = ffmpeg
+    runtime = _find_js_runtime()
     if runtime:
-        opts["js_runtimes"] = {runtime: {}}
+        opts["js_runtimes"] = {runtime[0]: {"path": runtime[1]}}
     if settings.proxy:
         opts["proxy"] = settings.proxy
     # The visitor's own cookies win; otherwise fall back to the server's.
