@@ -65,7 +65,8 @@ from the project's venv. To move to a newer ffmpeg, change the URLs and hashes t
 
 **Before releasing a new version:** bump `VERSION` in `grabbit_desktop/__init__.py` and `version` in
 `pyproject.toml`, and keep the `fastapi`/`uvicorn`/`yt-dlp` pins in `pyproject.toml` the same as
-`../grabbit-web/pyproject.toml`. Installing a new version over an old one keeps the person's setup,
+`../grabbit-web/pyproject.toml` (and the Android app's `ytdlpVersion` in
+`../grabbit-android/app/build.gradle.kts`). Installing a new version over an old one keeps the person's setup,
 and the old copy hands over to the new one by itself.
 
 ### Getting rid of the security warnings (optional, paid)

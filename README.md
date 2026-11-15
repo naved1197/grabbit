@@ -96,6 +96,7 @@ on your computer and hands the finished file back to the browser.
 | [`grabbit-desktop`](grabbit-desktop) | The Mac and Windows app: runs the server, bundles ffmpeg and deno, sets up the extension, updates yt-dlp. Includes the installer build scripts. |
 | [`grabbit-extension`](grabbit-extension) | The Chrome extension (also works in Edge, Brave, Opera, Vivaldi and Arc). |
 | [`grabbit-web`](grabbit-web) | The download server and paste-a-link website (FastAPI and yt-dlp). It can also be hosted online for phones: Docker, Fly.io or Render. |
+| [`grabbit-android`](grabbit-android) | The Android app: Share → Grabbit from any app. It runs `grabbit-web`'s download engine on the phone (not released yet). |
 
 ## Development
 
