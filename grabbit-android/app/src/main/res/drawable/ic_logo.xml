@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- grabbit-web/app/static/favicon.svg as a vector drawable, for the app bar. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path android:pathData="M18,2h28a16,16 0,0 1,16 16v28a16,16 0,0 1,-16 16h-28a16,16 0,0 1,-16 -16v-28a16,16 0,0 1,16 -16z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="2"
+                android:startY="2"
+                android:endX="62"
+                android:endY="62">
+                <item android:offset="0" android:color="#FF6A5AF9" />
+                <item android:offset="1" android:color="#FFB44CF0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillAlpha="0.95"
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M22,8c3,0 5,4 5,10v8h-10v-8c0,-6 2,-10 5,-10z" />
+    <path
+        android:fillAlpha="0.95"
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M42,8c3,0 5,4 5,10v8H37v-8c0,-6 2,-10 5,-10z" />
+    <path
+        android:fillColor="#FFE7A3FF"
+        android:pathData="M22,12c1.2,0 2,2 2,6v6h-4v-6c0,-4 0.8,-6 2,-6zM42,12c1.2,0 2,2 2,6v6h-4v-6c0,-4 0.8,-6 2,-6z" />
+    <path
+        android:pathData="M32,24L32,44M32,44L24,36M32,44L40,36"
+        android:strokeWidth="5"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M19,52L45,52"
+        android:strokeWidth="5"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round" />
+</vector>

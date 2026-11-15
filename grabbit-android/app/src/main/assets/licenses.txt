@@ -1,0 +1,31 @@
+Grabbit for Android
+Copyright © 2026 Cubehole. Grabbit's own code is MIT licensed:
+https://github.com/naved1197/grabbit
+
+This app is built with youtubedl-android, which is licensed under the GNU General Public License v3.0, so the app as a whole is distributed under the GPL v3. Its complete source code is at the link above.
+
+Included software and its licenses:
+
+• youtubedl-android (GPL-3.0)
+  https://github.com/yausername/youtubedl-android
+• yt-dlp (The Unlicense)
+  https://github.com/yt-dlp/yt-dlp
+• yt-dlp-ejs (The Unlicense)
+  https://github.com/yt-dlp/ejs
+• Python 3.12 (Python Software Foundation License)
+  https://www.python.org/
+• FFmpeg 7.1, built with libx264, LAME, Opus, libvpx and other libraries (GPL)
+  https://ffmpeg.org/
+• QuickJS (MIT)
+  https://bellard.org/quickjs/
+• AndroidX, Jetpack Compose, Material Components (Apache-2.0)
+  https://developer.android.com/jetpack
+• Kotlin, kotlinx.coroutines, kotlinx.serialization (Apache-2.0)
+  https://kotlinlang.org/
+• Coil (Apache-2.0)
+  https://coil-kt.github.io/coil/
+• OkHttp (Apache-2.0)
+  https://square.github.io/okhttp/
+• Jackson, Apache Commons IO (Apache-2.0), used by youtubedl-android
+
+DRM-protected video (Netflix, Prime Video, Disney+, Spotify, most paid courses) can't be downloaded.
