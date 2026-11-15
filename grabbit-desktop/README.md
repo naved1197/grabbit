@@ -16,7 +16,7 @@ drags the extension folder onto the browser's Extensions page once. The setup pa
 
 ## Sharing it: what to tell people
 
-**Mac** (`Grabbit-1.1.0-mac-apple-silicon.dmg`, or `-intel` for older Macs)
+**Mac** (`Grabbit-1.2.0-mac-apple-silicon.dmg`, or `-intel` for older Macs)
 
 1. Open the .dmg and drag **Grabbit** into **Applications**.
 2. Open Grabbit from Applications. macOS says it can't check it for malware, because it isn't
@@ -25,7 +25,7 @@ drags the extension folder onto the browser's Extensions page once. The setup pa
    "Grabbit was blocked". Confirm with your password. This is only needed the first time.
 3. A setup page opens in the browser. Follow its three steps.
 
-**Windows** (`Grabbit-Setup-1.1.0.exe`)
+**Windows** (`Grabbit-Setup-1.2.0.exe`)
 
 1. Run the installer. If Windows says "Windows protected your PC", click **More info** and then
    **Run anyway** (the installer isn't signed with a paid certificate).
