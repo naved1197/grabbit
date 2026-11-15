@@ -6,3 +6,7 @@ local.properties
 *.iml
 captures/
 engine/tests/__pycache__/
+
+# Release signing keys never go in the repo
+*.jks
+*.keystore

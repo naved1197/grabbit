@@ -14,6 +14,16 @@ val youtubedlAndroid = "0.18.1"
 val ytdlpVersion = "2026.10.26"
 val ytdlpSha256 = "e51e69e89489f199530f13d32a4342da3ddb2cf34842f364603a066db05afbf3"
 
+// The release workflow passes the tag's version (-PgrabbitVersion=1.2.0); 1.2.3 becomes versionCode 10203.
+val grabbitVersion = (findProperty("grabbitVersion") as String?)?.removePrefix("v") ?: "1.2.0"
+val grabbitVersionCode = grabbitVersion.split('.').map { it.takeWhile(Char::isDigit).toIntOrNull() ?: 0 }
+    .let { (it + listOf(0, 0, 0)).take(3) }.let { (major, minor, patch) -> major * 10000 + minor * 100 + patch }
+
+// Release signing, from the environment (GitHub secrets in the release workflow; see
+// packaging/make_release_key.sh). Without them, release builds come out unsigned.
+val releaseKeystore = System.getenv("GRABBIT_KEYSTORE")?.takeIf { it.isNotBlank() && file(it).isFile }
+val releaseKeystorePassword = System.getenv("GRABBIT_KEYSTORE_PASSWORD")
+
 android {
     namespace = "com.grabbit.android"
     compileSdk = 36
@@ -22,8 +32,8 @@ android {
         applicationId = "com.grabbit.android"
         minSdk = 29 // Android 10: saving to Downloads through MediaStore needs no storage permission
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.2.0"
+        versionCode = grabbitVersionCode
+        versionName = grabbitVersion
     }
 
     splits.abi {
@@ -51,8 +61,20 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    signingConfigs {
+        if (releaseKeystore != null && !releaseKeystorePassword.isNullOrEmpty()) {
+            create("release") {
+                storeFile = file(releaseKeystore)
+                storePassword = releaseKeystorePassword
+                keyAlias = System.getenv("GRABBIT_KEY_ALIAS")?.takeIf { it.isNotBlank() } ?: "grabbit"
+                keyPassword = releaseKeystorePassword // PKCS12 keystores use one password for both
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             // Shrinks the Compose/icon code from ~66 MB of dex to a few MB.
             isMinifyEnabled = true
             isShrinkResources = true

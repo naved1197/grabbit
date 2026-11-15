@@ -78,6 +78,31 @@ Engine tests run on the Mac with the phone's Python version, from the repository
 uv run --no-project --python 3.12 --with yt-dlp==2026.10.26 --with pytest pytest grabbit-android/engine/tests -q
 ```
 
+### Releases
+
+Pushing a version tag such as `v1.2.0` makes the [release workflow](../.github/workflows/desktop.yml) run the
+engine and unit tests and build signed APKs, versioned from the tag (`1.2.3` becomes versionCode 10203). It
+attaches them to the GitHub Release next to the desktop installers:
+
+* `Grabbit-<version>-android.apk` for arm64, which is nearly every phone
+* `-android-32bit.apk` for older armeabi-v7a phones
+* `-android-x86_64.apk` for Chromebooks and emulators
+
+**One-time setup: the signing key.** Run this on your own computer:
+
+```bash
+grabbit-android/packaging/make_release_key.sh
+```
+
+It creates `~/.grabbit/grabbit-release.jks` with `keytool`, then stores it as the `ANDROID_KEYSTORE_BASE64` and
+`ANDROID_KEYSTORE_PASSWORD` repository secrets with `gh`. Both tools ask you for the password; it isn't written
+anywhere else. **Back up the .jks file and its password.** Every update must be signed with the same key. If it's
+lost, people have to uninstall Grabbit before they can install a newer version.
+
+To sign a release build locally, set `GRABBIT_KEYSTORE` (the .jks path) and `GRABBIT_KEYSTORE_PASSWORD`. Without
+them, `assembleRelease` makes unsigned APKs. Debug builds are signed with the computer's own debug key, so to
+switch a phone from a debug build to a release, uninstall it first.
+
 ### Testing on a phone
 
 Debug builds log what yt-dlp does under the tags `Grabbit` and `Grabbit.engine`, and accept a link from the

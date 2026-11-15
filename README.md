@@ -39,6 +39,7 @@ on your own computer.
 | Mac with an Apple chip (M1 or later) | [`Grabbit-…-mac-apple-silicon.dmg`](https://github.com/naved1197/grabbit/releases/latest) |
 | Mac with an Intel processor | [`Grabbit-…-mac-intel.dmg`](https://github.com/naved1197/grabbit/releases/latest) |
 | Windows 10 or 11 (64-bit) | [`Grabbit-Setup-….exe`](https://github.com/naved1197/grabbit/releases/latest) |
+| Android 10 or later (from 1.2) | [`Grabbit-…-android.apk`](https://github.com/naved1197/grabbit/releases/latest) |
 
 Not sure which Mac you have? Open the Apple menu › **About This Mac**. "Chip: Apple M…" means Apple chip.
 
@@ -119,8 +120,9 @@ To try the extension, open `chrome://extensions`, turn on **Developer mode** and
 
 **Releasing:** bump the version in `grabbit-desktop/grabbit_desktop/__init__.py` and
 `grabbit-desktop/pyproject.toml`, then push a tag such as `v1.0.1`. The
-[Desktop app workflow](.github/workflows/desktop.yml) builds both Mac versions and the Windows installer and
-publishes the release. See [`grabbit-desktop/README.md`](grabbit-desktop/README.md) for details, including
+[release workflow](.github/workflows/desktop.yml) builds both Mac versions, the Windows installer and the Android
+APKs (versioned from the tag) and publishes the release. Android signing needs two repository secrets, created
+once with `grabbit-android/packaging/make_release_key.sh`. See [`grabbit-desktop/README.md`](grabbit-desktop/README.md) for details, including
 signing.
 
 ## Privacy
