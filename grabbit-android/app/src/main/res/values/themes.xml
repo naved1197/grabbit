@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="grabbit_bg">#F6F6FB</color>
+    <color name="grabbit_accent">#5B4CF0</color>
+
+    <style name="Theme.Grabbit" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/grabbit_bg</item>
+        <item name="android:colorAccent">@color/grabbit_accent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- The share sheet: a see-through window over the app the link came from. -->
+    <style name="Theme.Grabbit.Sheet" parent="Theme.Grabbit">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

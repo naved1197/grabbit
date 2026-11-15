@@ -1,6 +1,9 @@
-# Builds the Grabbit desktop installers:
-#   Grabbit-<version>-mac-apple-silicon.dmg, Grabbit-<version>-mac-intel.dmg, Grabbit-Setup-<version>.exe
-# Run it from the Actions tab ("Run workflow"), or push a tag like v1.0.0 to also publish a GitHub Release.
+# Builds Grabbit for every platform:
+#   Grabbit-<version>-mac-apple-silicon.dmg, Grabbit-<version>-mac-intel.dmg, Grabbit-Setup-<version>.exe,
+#   Grabbit-<version>-android.apk (+ -android-32bit, -android-x86_64)
+# Run it from the Actions tab ("Run workflow"), or push a tag like v1.2.0 to also publish a GitHub Release.
+# The Android build needs the ANDROID_KEYSTORE_BASE64 and ANDROID_KEYSTORE_PASSWORD secrets
+# (grabbit-android/packaging/make_release_key.sh creates them).
 name: Desktop app
 
 on:
@@ -66,9 +69,70 @@ jobs:
             grabbit-desktop/dist/*.exe
           if-no-files-found: error
 
+  android:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: grabbit-android
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: astral-sh/setup-uv@v10.3.3
+
+      - name: Android SDK
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-36" "build-tools;36.0.0" > /dev/null
+
+      - name: Test the engine (on Python 3.12, like the phone)
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg > /dev/null
+          uv run --no-project --python 3.12 --with "yt-dlp==$(sed -n 's/^val ytdlpVersion = "\(.*\)"$/\1/p' app/build.gradle.kts)" \
+            --with pytest pytest engine/tests -q
+
+      - name: Test and build signed APKs
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          GRABBIT_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$GRABBIT_KEYSTORE_PASSWORD" ]; then
+            echo "::error::Add the ANDROID_KEYSTORE_BASE64 and ANDROID_KEYSTORE_PASSWORD secrets (run grabbit-android/packaging/make_release_key.sh)."
+            exit 1
+          fi
+          export GRABBIT_KEYSTORE="$RUNNER_TEMP/grabbit-release.jks"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$GRABBIT_KEYSTORE"
+          VERSION_ARG=()
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then VERSION_ARG=(-PgrabbitVersion="${GITHUB_REF_NAME#v}"); fi
+          ./gradlew --no-daemon :app:testReleaseUnitTest :app:assembleRelease "${VERSION_ARG[@]}"
+          rm -f "$GRABBIT_KEYSTORE"
+
+      - name: Name and check the APKs
+        run: |
+          VERSION=$(sed -n 's/^val grabbitVersion = .*?: "\(.*\)"$/\1/p' app/build.gradle.kts)
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then VERSION="${GITHUB_REF_NAME#v}"; fi
+          APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          mkdir -p dist
+          for pair in arm64-v8a:android armeabi-v7a:android-32bit x86_64:android-x86_64; do
+            out="dist/Grabbit-$VERSION-${pair#*:}.apk"
+            cp "app/build/outputs/apk/release/app-${pair%%:*}-release.apk" "$out"
+            "$APKSIGNER" verify --print-certs "$out" | grep -m1 "certificate DN"
+          done
+          ls -la dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: grabbit-android
+          path: grabbit-android/dist/*.apk
+          if-no-files-found: error
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [build, android]
     runs-on: ubuntu-latest
     permissions:
       contents: write

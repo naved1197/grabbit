@@ -256,7 +256,8 @@ class JobManager:
             opts = self._options(job, logger)
             with yt_dlp.YoutubeDL(opts) as ydl:
                 ydl.add_post_processor(_BeforeDownload(self, job), when="before_dl")
-                if job.choice.mode == "video" and job.choice.container == "mp4" and ffmpeg_path():
+                if (self.settings.apple_compat and job.choice.mode == "video"
+                        and job.choice.container == "mp4" and ffmpeg_path()):
                     ydl.add_post_processor(_AppleCompat(job), when="post_process")
                 media, from_cache = self._extract(ydl, job, logger)
                 if job.cancel.is_set():
@@ -334,7 +335,8 @@ class JobManager:
         self._precheck(job, media.video)
         if job.cancel.is_set():
             raise DownloadCancelled()
-        self._prefer_apple_friendly(job, ydl, media.video)
+        if self.settings.apple_compat:  # only worth it when the file would otherwise be converted
+            self._prefer_apple_friendly(job, ydl, media.video)
         job.status = "downloading"
         job.stage = "Starting download"
         try:

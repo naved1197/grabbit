@@ -15,9 +15,11 @@ import socket
 import threading
 import time
 from collections import deque
+from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
 
-from fastapi import Request
+if TYPE_CHECKING:  # keeps normalize_url importable without FastAPI (the Android app's engine)
+    from fastapi import Request
 
 MAX_URL_LENGTH = 2048
 _SCHEME_RE = re.compile(r"^[a-z][a-z0-9+.-]*://", re.I)

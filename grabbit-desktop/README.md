@@ -16,7 +16,7 @@ drags the extension folder onto the browser's Extensions page once. The setup pa
 
 ## Sharing it: what to tell people
 
-**Mac** (`Grabbit-1.1.0-mac-apple-silicon.dmg`, or `-intel` for older Macs)
+**Mac** (`Grabbit-1.2.0-mac-apple-silicon.dmg`, or `-intel` for older Macs)
 
 1. Open the .dmg and drag **Grabbit** into **Applications**.
 2. Open Grabbit from Applications. macOS says it can't check it for malware, because it isn't
@@ -25,7 +25,7 @@ drags the extension folder onto the browser's Extensions page once. The setup pa
    "Grabbit was blocked". Confirm with your password. This is only needed the first time.
 3. A setup page opens in the browser. Follow its three steps.
 
-**Windows** (`Grabbit-Setup-1.1.0.exe`)
+**Windows** (`Grabbit-Setup-1.2.0.exe`)
 
 1. Run the installer. If Windows says "Windows protected your PC", click **More info** and then
    **Run anyway** (the installer isn't signed with a paid certificate).
@@ -65,7 +65,8 @@ from the project's venv. To move to a newer ffmpeg, change the URLs and hashes t
 
 **Before releasing a new version:** bump `VERSION` in `grabbit_desktop/__init__.py` and `version` in
 `pyproject.toml`, and keep the `fastapi`/`uvicorn`/`yt-dlp` pins in `pyproject.toml` the same as
-`../grabbit-web/pyproject.toml`. Installing a new version over an old one keeps the person's setup,
+`../grabbit-web/pyproject.toml` (and the Android app's `ytdlpVersion` in
+`../grabbit-android/app/build.gradle.kts`). Installing a new version over an old one keeps the person's setup,
 and the old copy hands over to the new one by itself.
 
 ### Getting rid of the security warnings (optional, paid)

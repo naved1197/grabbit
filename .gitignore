@@ -4,5 +4,5 @@
 # Local Claude Code settings (preview servers, permissions)
 .claude/
 
-# Separate Flet app with its own git repository
-grabbit/
+# Separate Flet app with its own git repository (anchored: grabbit-android has com/grabbit/ packages)
+/grabbit/

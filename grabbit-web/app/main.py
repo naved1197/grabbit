@@ -20,13 +20,13 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import load_settings
 from .cookies import MAX_COOKIE_TEXT, BadCookies, CookieSet, parse_cookies
-from .formats import DownloadChoice
+from .formats import DownloadChoice, Mode, check_audio_format, check_container, check_mode, check_quality
 from .jobs import JobLimitError, JobManager
 from .security import BadURL, RateLimiter, check_url, client_ip
 from .resolve import lookup
@@ -136,14 +136,43 @@ class JobMeta(BaseModel):
     duration: float | None = None
 
 
-class JobRequest(DownloadChoice):
+class ChoiceFields(BaseModel):
+    """The download choice as request fields, validated like formats.DownloadChoice."""
+
+    mode: Mode = "video"
+    quality: str = Field("best", description="best or a max height such as 1080")
+    container: str = "mp4"
+    audio_format: str = "mp3"
+
+    @field_validator("mode", mode="before")
+    @classmethod
+    def _mode(cls, v: str) -> str:
+        return check_mode(v)
+
+    @field_validator("quality")
+    @classmethod
+    def _quality(cls, v: str) -> str:
+        return check_quality(v)
+
+    @field_validator("container")
+    @classmethod
+    def _container(cls, v: str) -> str:
+        return check_container(v)
+
+    @field_validator("audio_format")
+    @classmethod
+    def _audio(cls, v: str) -> str:
+        return check_audio_format(v)
+
+
+class JobRequest(ChoiceFields):
     url: str = Field(max_length=4096)
     item: int | None = Field(None, ge=1, le=100, description="which item of a multi-item post (1-based)")
     meta: JobMeta | None = None
     cookies: str | None = CookieField
 
 
-class BatchRequest(DownloadChoice):
+class BatchRequest(ChoiceFields):
     items: list[JobRequest] = Field(min_length=1, max_length=200)
     cookies: str | None = CookieField
 
